@@ -1,3 +1,9 @@
+/**
+ * This module contains the full Deno SQLite3 ([`@db/sqlite`](https://jsr.io/@db/sqlite)) Kysely dialect.
+ * For the actual logic, see `./driver.ts`
+ * @module
+ */
+
 import type { Database } from "@db/sqlite";
 import {
 	type DatabaseIntrospector,
@@ -13,10 +19,12 @@ import {
 } from "@kysely/kysely";
 import { DenoSqlite3Driver } from "./driver.ts";
 
+/** Config for the Deno SQLite3 dialect. */
 export interface DenoSqlite3DialectConfig extends Omit<SqliteDialectConfig, "database"> {
 	database: Database | (() => Promise<Database>);
 }
 
+/** Kysely dialect that uses the Deno SQLite3 ([`@db/sqlite`](https://jsr.io/@db/sqlite)) library. */
 export class DenoSqlite3Dialect implements Dialect {
 	readonly #config: DenoSqlite3DialectConfig;
 

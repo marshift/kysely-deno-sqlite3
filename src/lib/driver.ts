@@ -1,4 +1,8 @@
-// Based on https://github.com/kysely-org/kysely/blob/v0.28.11/src/dialect/sqlite/sqlite-driver.ts
+/**
+ * This module contains a database driver to allow Kysely to work with Deno SQLite3 ([`@db/sqlite`](https://jsr.io/@db/sqlite)).
+ * Based on https://github.com/kysely-org/kysely/blob/v0.28.11/src/dialect/sqlite/sqlite-driver.ts
+ * @module
+ */
 
 import type { BindValue, Database } from "@db/sqlite";
 import {
@@ -66,6 +70,7 @@ const parseSavepointCommand = (
 		IdentifierNode.create(savepointName),
 	]);
 
+/** Kysely database driver that uses the Deno SQLite3 ([`@db/sqlite`](https://jsr.io/@db/sqlite)) library. */
 export class DenoSqlite3Driver implements Driver {
 	readonly #config: DenoSqlite3DialectConfig;
 	readonly #connectionMutex = new ConnectionMutex();
@@ -77,7 +82,7 @@ export class DenoSqlite3Driver implements Driver {
 		this.#config = Object.freeze({ ...config });
 	}
 
-	async init() {
+	async init(): Promise<void> {
 		this.#db = typeof this.#config.database === "function"
 			? await this.#config.database()
 			: this.#config.database;
@@ -86,20 +91,20 @@ export class DenoSqlite3Driver implements Driver {
 		await this.#config.onCreateConnection?.(this.#connection);
 	}
 
-	async acquireConnection() {
+	async acquireConnection(): Promise<DatabaseConnection> {
 		await this.#connectionMutex.lock();
 		return this.#connection!;
 	}
 
-	async beginTransaction(connection: DatabaseConnection) {
+	async beginTransaction(connection: DatabaseConnection): Promise<void> {
 		await connection.executeQuery(CompiledQuery.raw("begin"));
 	}
 
-	async commitTransaction(connection: DatabaseConnection) {
+	async commitTransaction(connection: DatabaseConnection): Promise<void> {
 		await connection.executeQuery(CompiledQuery.raw("commit"));
 	}
 
-	async rollbackTransaction(connection: DatabaseConnection) {
+	async rollbackTransaction(connection: DatabaseConnection): Promise<void> {
 		await connection.executeQuery(CompiledQuery.raw("rollback"));
 	}
 
@@ -107,7 +112,7 @@ export class DenoSqlite3Driver implements Driver {
 		connection: DatabaseConnection,
 		savepointName: string,
 		compileQuery: QueryCompiler["compileQuery"],
-	) {
+	): Promise<void> {
 		await connection.executeQuery(
 			compileQuery(
 				parseSavepointCommand("savepoint", savepointName),
@@ -120,7 +125,7 @@ export class DenoSqlite3Driver implements Driver {
 		connection: DatabaseConnection,
 		savepointName: string,
 		compileQuery: QueryCompiler["compileQuery"],
-	) {
+	): Promise<void> {
 		await connection.executeQuery(
 			compileQuery(
 				parseSavepointCommand("rollback to", savepointName),
@@ -133,7 +138,7 @@ export class DenoSqlite3Driver implements Driver {
 		connection: DatabaseConnection,
 		savepointName: string,
 		compileQuery: QueryCompiler["compileQuery"],
-	) {
+	): Promise<void> {
 		await connection.executeQuery(
 			compileQuery(
 				parseSavepointCommand("release", savepointName),
@@ -142,11 +147,11 @@ export class DenoSqlite3Driver implements Driver {
 		);
 	}
 
-	async releaseConnection() {
+	async releaseConnection(): Promise<void> {
 		this.#connectionMutex.unlock();
 	}
 
-	async destroy() {
+	async destroy(): Promise<void> {
 		this.#db?.close();
 	}
 }

@@ -20,7 +20,8 @@
 		}
 	},
 	"compilerOptions": {
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		"isolatedDeclarations": true
 	},
 	"unstable": ["ffi"]
 }
