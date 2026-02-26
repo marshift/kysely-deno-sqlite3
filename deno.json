@@ -1,0 +1,26 @@
+{
+	"name": "@marshift/kysely-deno-sqlite3",
+	"version": "1.0.0",
+	"license": "BSD-3-Clause",
+	"exports": "./src/mod.ts",
+	"imports": {
+		"@db/sqlite": "jsr:@db/sqlite@0.13.x",
+		"@kysely/kysely": "jsr:@kysely/kysely@0.28.x"
+	},
+	"publish": {
+		"include": [
+			"LICENSE",
+			"README.md",
+			"./src/"
+		]
+	},
+	"lint": {
+		"rules": {
+			"exclude": ["no-explicit-any", "require-await"]
+		}
+	},
+	"compilerOptions": {
+		"verbatimModuleSyntax": true
+	},
+	"unstable": ["ffi"]
+}
